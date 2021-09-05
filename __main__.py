@@ -126,9 +126,9 @@ def main ():
                 send_notifications (post)
 
         # Debug lines
-        post = "sample post meta: sample post text."
-        logs.info(f"New post: {post}", print_text=True)
-        send_notifications (post)
+        # post = "sample post meta: sample post text."
+        # logs.info(f"New post: {post}", print_text=True)
+        # send_notifications (post)
 
         # Wait for the next scrape
         refresh_time = credentials.get_credential("refresh_time")
