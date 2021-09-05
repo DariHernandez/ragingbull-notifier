@@ -4,18 +4,23 @@ from log import Log
 from config import Config
 from scraping_manager.automate import Web_scraping
 from email_manager.sender import Email_manager
-from telegram_api.bot import telegram_bot_sendtext
+from telegram.bot import telegram_bot_sendtext
 
 # Global variables
 scraper = None
 credentials = Config()
+logs = Log(os.path.basename(__file__))
 
 def login (): 
     """ Login to page and create scraper instance """
-    
-    # Web scraping instance
+
+    # Global variables
     global scraper
     global credentials
+    global logs
+
+    # Web scraping instance
+    logs.info("Starting browser and login in main page", print_text=True)
     home_page = "https://app.ragingbull.com/member/login"
     scraper = Web_scraping(home_page, headless=True)
 
@@ -33,12 +38,14 @@ def login ():
     t.sleep(5)
 
     # Disclaimer
+    logs.info("Accepting disclaimer", print_text=True)
     scraper.refresh_selenium()
     selector_disclaimer = ".btn.btn-success.btn-lg"
     scraper.click_js(selector_disclaimer)
     t.sleep(5)
 
     # Target page
+    logs.info("Loading target page", print_text=True)
     web_page = "https://app.ragingbull.com/rooms/rb-the-workshop"
     scraper.set_page(web_page)
     t.sleep(5)
@@ -70,9 +77,12 @@ def main ():
 
     """ Extract data, send notifications and restart browser """
 
-    # Start time and first login 
+    # Global variables
     global scraper
     global credentials
+    global logs
+
+    # Start time and first login 
     start_time = t.time()
     login()
 
@@ -90,6 +100,7 @@ def main ():
             start_time = t.time()
 
         # Get post
+        logs.info("Refreshing page", print_text=True)
         scraper.refresh_selenium()
         selector_post = "section.announcement-wrapper.panel.panel-primary > div > div > ul > li"
         post_elem = scraper.get_elems (selector_post)
@@ -107,14 +118,16 @@ def main ():
             text = scraper.get_text (selector_text)
             post = f"{meta} {text}"
 
+
             # Validate last posts
             if post not in post_list: 
                 post_list.append (post)
-                print (f"New post: {post}")
+                logs.info(f"New post: {post}", print_text=True)
                 send_notifications (post)
 
         # Debug lines
         post = "sample post meta: sample post text."
+        logs.info(f"New post: {post}", print_text=True)
         send_notifications (post)
 
         # Wait for the next scrape
