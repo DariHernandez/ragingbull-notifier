@@ -3,15 +3,20 @@ import time as t
 from log import Log
 from config import Config
 from scraping_manager.automate import Web_scraping
+from email_manager.sender import Email_manager
 
-def main (): 
+# Global variables
+scraper = None
+credentials = Config()
 
-    # Config instance
-    credentials = Config()
+def login (): 
+    """ Login to page and create scraper instance """
     
     # Web scraping instance
+    global scraper
+    global credentials
     home_page = "https://app.ragingbull.com/member/login"
-    scraper = Web_scraping(home_page, headless=False)
+    scraper = Web_scraping(home_page, headless=True)
 
     # login to page
     user = credentials.get_credential("page_user")
@@ -23,14 +28,13 @@ def main ():
 
     scraper.send_data(selector_email, user)
     scraper.send_data(selector_password, password)
-    scraper.click(selector_login)
+    scraper.click_js(selector_login)
     t.sleep(5)
-
 
     # Disclaimer
     scraper.refresh_selenium()
     selector_disclaimer = ".btn.btn-success.btn-lg"
-    scraper.click(selector_disclaimer)
+    scraper.click_js(selector_disclaimer)
     t.sleep(5)
 
     # Target page
@@ -38,37 +42,76 @@ def main ():
     scraper.set_page(web_page)
     t.sleep(5)
 
+def send_notifications (post): 
+    """ Send email and telegram notifications """
 
-    # Get post
-    scraper.refresh_selenium()
-    selector_post = "section.announcement-wrapper.panel.panel-primary > div > div > ul > li"
-    post_elem = scraper.get_elems (selector_post)
+    # Send email
+    email = credentials.get_credential("email")
+    password = credentials.get_credential("password")
+    to_emails = credentials.get_credential("to_emails")
+    email_sender = Email_manager(email, password)
+    email_sender.send_email(receivers=to_emails,
+                            subject="New menssage of Trading Feed", 
+                            body=post, 
+                            print_status=True)
 
+    # Send notification
+
+
+def main (): 
+
+    """ Extract data, send notifications and restart browser """
+
+    # Start time and first login 
+    global scraper
+    global credentials
+    start_time = t.time()
+    login()
+
+    # Main loop for get post
     post_list = []
+    while True: 
 
-    index_post = 0
-    for elem in post_elem: 
+        # Calculate time for restart browser
+        current_time = t.time()
+        restart_time = credentials.get_credential("restart_time")
+        if (current_time - start_time) > restart_time: 
+            print ("Restarting browser...")
+            scraper.end_browser()
+            login()
+            start_time = t.time()
 
-        index_post += 1
+        # Get post
+        scraper.refresh_selenium()
+        selector_post = "section.announcement-wrapper.panel.panel-primary > div > div > ul > li"
+        post_elem = scraper.get_elems (selector_post)
 
-        # Get post 
-        selector_meta = f"{selector_post}:nth-child({index_post}) > .announcement-right > .annoucement-meta"
-        selector_text = f"{selector_post}:nth-child({index_post}) > .announcement-right > .annoucement-text"
+        index_post = 0
+        for elem in post_elem: 
 
-        meta = scraper.get_text (selector_meta)
-        text = scraper.get_text (selector_text)
+            index_post += 1
 
-        post = f"{meta} {text}"
-        
-        # if not post_list: 
-        #     post_list.app
+            # Get post 
+            selector_meta = f"{selector_post}:nth-child({index_post}) > .announcement-right > .annoucement-meta"
+            selector_text = f"{selector_post}:nth-child({index_post}) > .announcement-right > .annoucement-text"
 
+            meta = scraper.get_text (selector_meta)
+            text = scraper.get_text (selector_text)
+            post = f"{meta} {text}"
 
-    input ("end?")
+            # Validate last posts
+            if post not in post_list: 
+                post_list.append (post)
+                print (f"New post: {post}")
+                send_notifications (post)
 
+        # Debug lines
+        post = "sample_post"
+        send_notifications (post)
 
-    
-
+        # Wait for the next scrape
+        refresh_time = credentials.get_credential("refresh_time")
+        t.sleep (refresh_time)
 
 if __name__ == "__main__":
     main()
