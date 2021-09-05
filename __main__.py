@@ -4,6 +4,7 @@ from log import Log
 from config import Config
 from scraping_manager.automate import Web_scraping
 from email_manager.sender import Email_manager
+from telegram_api.bot import telegram_bot_sendtext
 
 # Global variables
 scraper = None
@@ -45,18 +46,25 @@ def login ():
 def send_notifications (post): 
     """ Send email and telegram notifications """
 
-    # Send email
+    # Get email credentials
     email = credentials.get_credential("email")
     password = credentials.get_credential("password")
     to_emails = credentials.get_credential("to_emails")
+    
+    # Send email
     email_sender = Email_manager(email, password)
     email_sender.send_email(receivers=to_emails,
                             subject="New menssage of Trading Feed", 
                             body=post, 
                             print_status=True)
 
-    # Send notification
+    # Get telegram credentials
+    bot_token = credentials.get_credential("bot_token")
+    bot_message = f"New menssage: {post}"
+    chat_ids = credentials.get_credential("telegram_chats")
 
+    # Send telegram menssage
+    telegram_bot_sendtext (bot_token, bot_message, chat_ids)
 
 def main (): 
 
@@ -106,7 +114,7 @@ def main ():
                 send_notifications (post)
 
         # Debug lines
-        post = "sample_post"
+        post = "sample post meta: sample post text."
         send_notifications (post)
 
         # Wait for the next scrape
