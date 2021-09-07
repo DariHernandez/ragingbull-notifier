@@ -61,16 +61,16 @@ def send_notifications (post):
     # Send email
     email_sender = Email_manager(email, password)
     email_sender.send_email(receivers=to_emails,
-                            subject="New menssage of Trading Feed", 
+                            subject="New message of Trading Feed", 
                             body=post, 
                             print_status=True)
 
     # Get telegram credentials
     bot_token = credentials.get_credential("bot_token")
-    bot_message = f"New menssage: {post}"
+    bot_message = f"New message: {post}"
     chat_ids = credentials.get_credential("telegram_chats")
 
-    # Send telegram menssage
+    # Send telegram message
     telegram_bot_sendtext (bot_token, bot_message, chat_ids)
 
 def main (): 
@@ -118,9 +118,8 @@ def main ():
             text = scraper.get_text (selector_text)
             post = f"{meta} {text}"
 
-
             # Validate last posts
-            if post not in post_list: 
+            if post not in post_list and "Ben Sturgill" in meta: 
                 post_list.append (post)
                 logs.info(f"New post: {post}", print_text=True)
                 send_notifications (post)
