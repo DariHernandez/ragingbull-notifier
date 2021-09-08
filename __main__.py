@@ -53,17 +53,17 @@ def login ():
 def send_notifications (post): 
     """ Send email and telegram notifications """
 
-    # Get email credentials
-    email = credentials.get_credential("email")
-    password = credentials.get_credential("password")
-    to_emails = credentials.get_credential("to_emails")
+    # # Get email credentials
+    # email = credentials.get_credential("email")
+    # password = credentials.get_credential("password")
+    # to_emails = credentials.get_credential("to_emails")
     
-    # Send email
-    email_sender = Email_manager(email, password)
-    email_sender.send_email(receivers=to_emails,
-                            subject="New message of Trading Feed", 
-                            body=post, 
-                            print_status=True)
+    # # Send email
+    # email_sender = Email_manager(email, password)
+    # email_sender.send_email(receivers=to_emails,
+    #                         subject="New message of Trading Feed", 
+    #                         body=post, 
+    #                         print_status=True)
 
     # Get telegram credentials
     bot_token = credentials.get_credential("bot_token")
