@@ -103,7 +103,7 @@ def main ():
         logs.info("Refreshing page", print_text=True)
         scraper.refresh_selenium()
         selector_post = "section.announcement-wrapper.panel.panel-primary > div > div > ul > li"
-        post_elem = scraper.get_elems (selector_post)
+        post_elem = scraper.get_text (selector_post)
 
         index_post = 0
         for elem in post_elem: 
@@ -119,10 +119,11 @@ def main ():
             post = f"{meta} {text}"
 
             # Validate last posts
-            if post not in post_list and "Ben Sturgill" in meta: 
-                post_list.append (post)
-                logs.info(f"New post: {post}", print_text=True)
-                send_notifications (post)
+            if text and meta:
+                if post not in post_list and "Ben Sturgill" in meta: 
+                    post_list.append (post)
+                    logs.info(f"New post: {post}", print_text=True)
+                    send_notifications (post)
 
         # Debug lines
         # post = "sample post meta: sample post text."
