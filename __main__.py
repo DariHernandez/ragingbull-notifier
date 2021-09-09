@@ -103,32 +103,33 @@ def main ():
         logs.info("Refreshing page", print_text=True)
         scraper.refresh_selenium()
         selector_post = "section.announcement-wrapper.panel.panel-primary > div > div > ul > li"
-        post_elem = scraper.get_text (selector_post)
+        post_elems = scraper.get_text (selector_post)
 
         index_post = 0
-        for elem in post_elem: 
+        if post_elems:
+            for elem in post_elems: 
 
-            index_post += 1
+                index_post += 1
 
-            # Get post 
-            selector_meta = f"{selector_post}:nth-child({index_post}) > .announcement-right > .annoucement-meta"
-            selector_text = f"{selector_post}:nth-child({index_post}) > .announcement-right > .annoucement-text"
+                # Get post 
+                selector_meta = f"{selector_post}:nth-child({index_post}) > .announcement-right > .annoucement-meta"
+                selector_text = f"{selector_post}:nth-child({index_post}) > .announcement-right > .annoucement-text"
 
-            meta = scraper.get_text (selector_meta)
-            text = scraper.get_text (selector_text)
-            post = f"{meta} {text}"
+                meta = scraper.get_text (selector_meta)
+                text = scraper.get_text (selector_text)
+                post = f"{meta} {text}"
 
-            # Validate last posts
-            if text and meta:
-                if post not in post_list and "Ben Sturgill" in meta: 
-                    post_list.append (post)
-                    logs.info(f"New post: {post}", print_text=True)
-                    send_notifications (post)
+                # Validate last posts
+                if text and meta:
+                    if post not in post_list and "Ben Sturgill" in meta: 
+                        post_list.append (post)
+                        logs.info(f"New post: {post}", print_text=True)
+                        send_notifications (post)
 
-        # Debug lines
-        # post = "sample post meta: sample post text."
-        # logs.info(f"New post: {post}", print_text=True)
-        # send_notifications (post)
+            # Debug lines
+            # post = "sample post meta: sample post text."
+            # logs.info(f"New post: {post}", print_text=True)
+            # send_notifications (post)
 
         # Wait for the next scrape
         refresh_time = credentials.get_credential("refresh_time")
