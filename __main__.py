@@ -147,7 +147,7 @@ def main ():
                     last_posts = get_posts_list()
                     if not post in last_posts:
 
-                        if post not in post_list and "Ben Sturgill" in meta: 
+                        if post not in post_list and ("Ben Sturgill" in meta or "Taylor" in meta): 
                             post_list.append (post)
                             logs.info(f"New post: {post}", print_text=True)
                             send_notifications (post)
