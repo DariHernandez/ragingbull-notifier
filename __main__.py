@@ -23,7 +23,13 @@ def login ():
     # Web scraping instance
     logs.info("Starting browser and login in main page", print_text=True)
     home_page = "https://app.ragingbull.com/member/login"
-    scraper = Web_scraping(home_page, headless=True)
+    while True:
+        try:
+            scraper = Web_scraping(home_page, headless=True)
+        except: 
+            continue
+        else: 
+            break
 
     # login to page
     user = credentials.get_credential("page_user")
@@ -48,7 +54,13 @@ def login ():
     # Target page
     logs.info("Loading target page", print_text=True)
     web_page = "https://app.ragingbull.com/rooms/rb-the-workshop"
-    scraper.set_page(web_page)
+    while True:
+        try:
+            scraper.set_page(web_page)
+        except: 
+            continue
+        else: 
+            break
     t.sleep(5)
 
 def send_notifications (post): 
