@@ -10,6 +10,7 @@ from telegram.bot import telegram_bot_sendtext
 scraper = None
 credentials = Config()
 logs = Log(os.path.basename(__file__))
+posts_file_path = os.path.join (os.path.dirname (__file__), "last_posts.txt")
 
 def login (): 
     """ Login to page and create scraper instance """
@@ -73,6 +74,15 @@ def send_notifications (post):
     # Send telegram message
     telegram_bot_sendtext (bot_token, bot_message, chat_ids)
 
+def update_posts_file (post):
+    with open (posts_file_path, "a") as file: 
+        file.write(f"{post}\n")
+
+
+def get_posts_list ():
+    with open (posts_file_path) as file: 
+        return str(file.read()).splitlines()
+        
 def main (): 
 
     """ Extract data, send notifications and restart browser """
@@ -121,10 +131,15 @@ def main ():
 
                 # Validate last posts
                 if text and meta:
-                    if post not in post_list and "Ben Sturgill" in meta: 
-                        post_list.append (post)
-                        logs.info(f"New post: {post}", print_text=True)
-                        send_notifications (post)
+
+                    last_posts = get_posts_list()
+                    if not post in last_posts:
+
+                        if post not in post_list and "Ben Sturgill" in meta: 
+                            post_list.append (post)
+                            logs.info(f"New post: {post}", print_text=True)
+                            send_notifications (post)
+                            update_posts_file (post)
 
             # Debug lines
             # post = "sample post meta: sample post text."
