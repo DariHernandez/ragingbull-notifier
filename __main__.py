@@ -147,11 +147,11 @@ def main ():
                     last_posts = get_posts_list()
                     if not post in last_posts:
 
-                        if post not in post_list and ("Ben Sturgill" in meta or "Taylor" in meta): 
-                            post_list.append (post)
-                            logs.info(f"New post: {post}", print_text=True)
-                            send_notifications (post)
-                            update_posts_file (post)
+                        # if post not in post_list and ("Ben Sturgill" in meta or "Taylor" in meta): 
+                        post_list.append (post)
+                        logs.info(f"New post: {post}", print_text=True)
+                        send_notifications (post)
+                        update_posts_file (post)
 
             # Debug lines
             # post = "sample post meta: sample post text."
