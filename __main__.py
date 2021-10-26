@@ -12,6 +12,19 @@ credentials = Config()
 logs = Log(os.path.basename(__file__))
 posts_file_path = os.path.join (os.path.dirname (__file__), "last_posts.txt")
 
+# Get stonks list from local file
+stonks_path = os.path.join ("stocks_list.txt")
+with open (stonks_path) as stonks_file:
+    stonks = stonks_file.read().lower().split (", ")
+
+    # Create stonks dicctionary
+    stonks_dict = {}
+    for stonk in stonks:
+        stonks_dict[stonk] = {
+            "counter": 0,
+            "posts": []
+        }
+
 def login (): 
     """ Login to page and create scraper instance """
 
@@ -25,7 +38,7 @@ def login ():
     home_page = "https://app.ragingbull.com/member/login"
     while True:
         try:
-            scraper = Web_scraping(home_page, headless=True)
+            scraper = Web_scraping(home_page, headless=False)
         except: 
             continue
         else: 
@@ -61,7 +74,7 @@ def login ():
             continue
         else: 
             break
-    t.sleep(5)
+    t.sleep(5)    
 
 def send_notifications (post): 
     """ Send email and telegram notifications """
@@ -94,7 +107,7 @@ def update_posts_file (post):
 def get_posts_list ():
     with open (posts_file_path) as file: 
         return str(file.read()).splitlines()
-        
+
 def main (): 
 
     """ Extract data, send notifications and restart browser """
@@ -139,7 +152,7 @@ def main ():
 
                 meta = scraper.get_text (selector_meta)
                 text = scraper.get_text (selector_text)
-                post = f"{meta} {text}"
+                post = f"{meta}   {text}"
 
                 # Validate last posts
                 if text and meta:
@@ -152,6 +165,58 @@ def main ():
                         logs.info(f"New post: {post}", print_text=True)
                         send_notifications (post)
                         update_posts_file (post)
+
+                # Validate stonks
+                for stonk in stonks:
+
+                    # Search stonk in message
+                    valid_post = False
+                    stonks_formated = [
+                        f" {stonk} ",
+                        f",{stonk},",
+                        f" {stonk},",
+                        f":{stonk} ",
+                        f":{stonk},",
+                        f":{stonk}.",
+                        f" {stonk}.",
+                    ]
+
+                    stonks_end =  [
+                        f",{stonk}"
+                        f" {stonk}"
+                    ]
+
+                    for stonk_formated in stonks_formated:
+                        if stonk_formated in post.lower():
+                            valid_post = True
+                            break
+                    
+                    if not valid_post:
+                        for stonk_end in stonks_end:
+                            if post.lower().endswith(stonk_end):
+                                valid_post = True
+                                break
+
+                    # Incress counters and send message
+                    if valid_post:
+                        if not post in stonks_dict[stonk]["posts"]:
+                            stonks_dict[stonk]["counter"] += 1
+                            stonks_dict[stonk]["posts"].append (post)
+
+                        # Create stonk message
+                        if stonks_dict[stonk]["counter"] >= 2:
+                            new_post = stonks_dict[stonk]["posts"][-1]
+                            last_post = stonks_dict[stonk]["posts"][-2]
+                            stonk_message = f"Stonk: {stonk.upper()}\n\nNew post: \n{last_post}\n\nLast post: \n{new_post}\n"
+                            stonk_message_formated = stonk_message.replace ("\n", " ")
+
+                            # Send stonk message
+                            last_posts = get_posts_list()
+                            if not stonk_message_formated in last_posts:
+                                post_list.append (post)
+                                logs.info(f"New stonk: {stonk_message}", print_text=True)
+                                send_notifications (stonk_message)
+                                update_posts_file (stonk_message_formated)
 
             # Debug lines
             # post = "sample post meta: sample post text."
