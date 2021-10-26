@@ -1,5 +1,6 @@
 import os
 import time as t
+import datetime
 from log import Log
 from config import Config
 from scraping_manager.automate import Web_scraping
@@ -24,6 +25,13 @@ with open (stonks_path) as stonks_file:
             "counter": 0,
             "posts": []
         }
+
+def get_post_time (post_text):
+    
+    time_start = post_text.find (" - ")
+    time_text = str(post_text[:time_start]).strip()
+    post_time = datetime.datetime.strptime (time_text, "%b %d, %Y at %I:%M %p")
+    return post_time
 
 def login (): 
     """ Login to page and create scraper instance """
@@ -207,7 +215,17 @@ def main ():
                         if stonks_dict[stonk]["counter"] >= 2:
                             new_post = stonks_dict[stonk]["posts"][-1]
                             last_post = stonks_dict[stonk]["posts"][-2]
-                            stonk_message = f"Stonk: {stonk.upper()}\n\nNew post: \n{last_post}\n\nLast post: \n{new_post}\n"
+
+                            # Order post
+                            new_post_time = get_post_time (new_post)
+                            last_post_time = get_post_time (last_post)
+
+                            if  new_post_time > last_post_time: 
+                                stonk_message = f"Stonk: {stonk.upper()}\n\nNew post: \n{new_post}\n\nLast post: \n{last_post}\n"
+                            else:
+                                stonk_message = f"Stonk: {stonk.upper()}\n\nNew post: \n{last_post}\n\nLast post: \n{new_post}\n"
+                                
+                            # Clean text for save in local file
                             stonk_message_formated = stonk_message.replace ("\n", " ")
 
                             # Send stonk message
