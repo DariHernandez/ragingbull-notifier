@@ -13,19 +13,6 @@ credentials = Config()
 logs = Log(os.path.basename(__file__))
 posts_file_path = os.path.join (os.path.dirname (__file__), "last_posts.txt")
 
-# Get stonks list from local file
-stonks_path = os.path.join ("stocks_list.txt")
-with open (stonks_path) as stonks_file:
-    stonks = stonks_file.read().lower().split (", ")
-
-    # Create stonks dicctionary
-    stonks_dict = {}
-    for stonk in stonks:
-        stonks_dict[stonk] = {
-            "counter": 0,
-            "posts": []
-        }
-
 def get_post_time (post_text):
     
     time_start = post_text.find (" - ")
@@ -162,84 +149,44 @@ def main ():
                 text = scraper.get_text (selector_text)
                 post = f"{meta}   {text}"
 
+                valid_users = [
+                    "ben sturgill",
+                    "stacy",
+                    "sthan harms",
+                    "taylor"
+                ]
+
+                keywords = [
+                    "add",
+                    "added"
+                ]
+
                 # Validate last posts
                 if text and meta:
 
                     last_posts = get_posts_list()
                     if not post in last_posts:
 
-                        # if post not in post_list and ("Ben Sturgill" in meta or "Taylor" in meta): 
-                        post_list.append (post)
-                        logs.info(f"New post: {post}", print_text=True)
-                        send_notifications (post)
-                        update_posts_file (post)
-
-                # Validate stonks
-                for stonk in stonks:
-
-                    # Search stonk in message
-                    valid_post = False
-                    stonks_formated = [
-                        f" {stonk} ",
-                        f",{stonk},",
-                        f" {stonk},",
-                        f":{stonk} ",
-                        f":{stonk},",
-                        f":{stonk}.",
-                        f" {stonk}.",
-                    ]
-
-                    stonks_end =  [
-                        f",{stonk}"
-                        f" {stonk}"
-                    ]
-
-                    for stonk_formated in stonks_formated:
-                        if stonk_formated in post.lower():
-                            valid_post = True
-                            break
-                    
-                    if not valid_post:
-                        for stonk_end in stonks_end:
-                            if post.lower().endswith(stonk_end):
-                                valid_post = True
+                        # Valida users
+                        valid_user = False
+                        for user in valid_users: 
+                            if user in meta.lower():
+                                valid_user = True
+                                break
+                        
+                        # Validate keywords
+                        valid_keywords = False
+                        for keyword in keywords: 
+                            if keyword in text.lower():
+                                valid_keywords = True
                                 break
 
-                    # Incress counters and send message
-                    if valid_post:
-                        if not post in stonks_dict[stonk]["posts"]:
-                            stonks_dict[stonk]["counter"] += 1
-                            stonks_dict[stonk]["posts"].append (post)
-
-                        # Create stonk message
-                        if stonks_dict[stonk]["counter"] >= 2:
-                            new_post = stonks_dict[stonk]["posts"][-1]
-                            last_post = stonks_dict[stonk]["posts"][-2]
-
-                            # Order post
-                            new_post_time = get_post_time (new_post)
-                            last_post_time = get_post_time (last_post)
-
-                            if  new_post_time > last_post_time: 
-                                stonk_message = f"Stonk: {stonk.upper()}\n\nNew post: \n{new_post}\n\nLast post: \n{last_post}\n"
-                            else:
-                                stonk_message = f"Stonk: {stonk.upper()}\n\nNew post: \n{last_post}\n\nLast post: \n{new_post}\n"
-                                
-                            # Clean text for save in local file
-                            stonk_message_formated = stonk_message.replace ("\n", " ")
-
-                            # Send stonk message
-                            last_posts = get_posts_list()
-                            if not stonk_message_formated in last_posts:
-                                post_list.append (post)
-                                logs.info(f"New stonk: {stonk_message}", print_text=True)
-                                send_notifications (stonk_message)
-                                update_posts_file (stonk_message_formated)
-
-            # Debug lines
-            # post = "sample post meta: sample post text."
-            # logs.info(f"New post: {post}", print_text=True)
-            # send_notifications (post)
+                        # Only send the post who match with spcific users and keywords
+                        if valid_user and valid_keywords:
+                            post_list.append (post)
+                            logs.info(f"New post: {post}", print_text=True)
+                            send_notifications (post)
+                            update_posts_file (post)
 
         # Wait for the next scrape
         refresh_time = credentials.get_credential("refresh_time")
