@@ -41,95 +41,95 @@ Project type: **client's project**
 
 # Details
 
-## Workflow\r
-\r
-1. Login to page\r
-2. Go to Trading Feed secction \r
-3. Send an email and telegram menssage for each post in Trading Feed\r
-4. For for seach update in the Trading Feed (edit in config file) \r
+## Workflow
+
+1. Login to page
+2. Go to Trading Feed secction 
+3. Send an email and telegram menssage for each post in Trading Feed
+4. For for seach update in the Trading Feed (edit in config file) 
 5. After specific wait time, restart browser (edit in config file)
 
 # Install
 
-## Third party modules\r
-\r
-Install all modules from pip: \r
-\r
-\\`\\`\\` bash\r
-$ pip install -r requirements.txt\r
-\\`\\`\\`\r
-\r
-## Programs\r
-\r
-To run the project, the following programs must be installed:\r
-\r
+## Third party modules
+
+Install all modules from pip: 
+
+``` bash
+$ pip install -r requirements.txt
+```
+
+## Programs
+
+To run the project, the following programs must be installed:
+
 * [Google Chrome](https://www.google.com/intl/es/chrome) last version
 
 # Settings
 
-# Settings\r
-\r
-## config.json\r
-\r
-All **configurations** are saved in the **config.json file**, so **you can edit it manually**.\r
-\r
-Sample config.json file\r
-\\`\\`\\` json \r
-{\r
-    \\\"page_user\\\": \\\"my_email@gmail.com\\\",\r
-    \\\"page_pass\\\": \\\"my_pass\\\",\r
-    \\\"refresh_time\\\": 60,\r
-    \\\"restart_time\\\": 3600,\r
-    \\\"email\\\": \\\"my_email@gmail.com\\\",\r
-    \\\"password\\\": \\\"my password\\\",\r
-    \\\"to_emails\\\": [\\\"email1@gmail.com\\\", \\\"email2@gmail.com\\\"],\r
-    \\\"telegram_chats\\\": [\\\"1207825117\\\", \\\"1234567890\\\"],\r
-    \\\"bot_token\\\": \\\"1922000000:AAFYpemOJaydGC_pVCMKBDoE42i-AAAAAAA\\\"\r
-}\r
-\\`\\`\\`\r
-\r
-### page_user\r
-\r
-Email for login in page app.ragingbull.com\r
-\r
-### page_pass\r
-\r
-Password for lofin in page app.ragingbull.com\r
-\r
-### refresh_time\r
-\r
-Time to wait (in secods) for search updates again in the page (60 seconds recomendet)\r
-\r
-### restart_time\r
-\r
-Time to wait (in secods) for restart google chrome (600 seconds recomendet)\r
-\r
-### email\r
-\r
-Email for send notifications. \r
-The program currently support the next emails provaiders: \r
-* gmail.com\r
-* outlook.com\r
-* hotmail.com\r
-* live.com\r
-* yahoo.com\r
-* aol.com\r
-\r
-### password\r
-\r
-Password of your email or application password for the email. \r
-More details about *gmail application password* in next secction.\r
-\r
-### to_emails\r
-\r
-List of emails who will recibe the notification.\r
-\r
-### telegram_chats\r
-\r
-Id of telegram chats, linked with the bot, who will recibe the notification.\r
-\r
-### bot_token\r
-\r
+# Settings
+
+## config.json
+
+All **configurations** are saved in the **config.json file**, so **you can edit it manually**.
+
+Sample config.json file
+``` json 
+{
+    "page_user": "my_email@gmail.com",
+    "page_pass": "my_pass",
+    "refresh_time": 60,
+    "restart_time": 3600,
+    "email": "my_email@gmail.com",
+    "password": "my password",
+    "to_emails": ["email1@gmail.com", "email2@gmail.com"],
+    "telegram_chats": ["1207825117", "1234567890"],
+    "bot_token": "1922000000:AAFYpemOJaydGC_pVCMKBDoE42i-AAAAAAA"
+}
+```
+
+### page_user
+
+Email for login in page app.ragingbull.com
+
+### page_pass
+
+Password for lofin in page app.ragingbull.com
+
+### refresh_time
+
+Time to wait (in secods) for search updates again in the page (60 seconds recomendet)
+
+### restart_time
+
+Time to wait (in secods) for restart google chrome (600 seconds recomendet)
+
+### email
+
+Email for send notifications. 
+The program currently support the next emails provaiders: 
+* gmail.com
+* outlook.com
+* hotmail.com
+* live.com
+* yahoo.com
+* aol.com
+
+### password
+
+Password of your email or application password for the email. 
+More details about *gmail application password* in next secction.
+
+### to_emails
+
+List of emails who will recibe the notification.
+
+### telegram_chats
+
+Id of telegram chats, linked with the bot, who will recibe the notification.
+
+### bot_token
+
 Private telegram bot token.
 
 # Run
